@@ -48,7 +48,7 @@
             <button id="split-button" type="button"
                     ng-class="{'btn-default btn-sm': $ctrl.refreshRate === null,'btn-primary btn-sm':$ctrl.refreshRate !== null}"
                     class="btn btn-sm" ng-click="$ctrl.refreshDashboard()">
-              <i class="zmdi zmdi-refresh"></i> {{$ctrl.refreshRate === null ? 'Refresh' : $ctrl.refreshRate.name}}
+              <i class="zmdi zmdi-refresh" ng-class="{'zmdi-hc-spin': $ctrl.refreshInProgress}"></i> {{$ctrl.refreshRate === null ? 'Refresh' : $ctrl.refreshRate.name}}
             </button>
             <button type="button" class="btn hidden-xs" uib-dropdown-toggle
                     ng-class="{'btn-default btn-sm': $ctrl.refreshRate === null,'btn-primary btn-sm':$ctrl.refreshRate !== null}">
@@ -67,7 +67,7 @@
           <button type="button" class="btn btn-sm hidden-xs" ng-class="{'btn-default': !$ctrl.isFullscreen, 'btn-primary': $ctrl.isFullscreen}" tooltip="Enable/Disable Fullscreen display" ng-click="$ctrl.toggleFullscreen()" ng-if="!$ctrl.dashboard.is_draft && !$ctrl.layoutEditing">
             <span class="zmdi zmdi-fullscreen"></span>
           </button>
-          <button type="button" class="btn btn-sm hidden-xs" ng-class="{'btn-default': !$ctrl.dashboard.publicAccessEnabled, 'btn-primary': $ctrl.dashboard.publicAccessEnabled}" tooltip="Enable/Disable Share URL" ng-click="$ctrl.openShareForm()" ng-if="($ctrl.dashboard.canEdit() || $ctrl.dashboard.publicAccessEnabled) && !$ctrl.dashboard.is_draft && !$ctrl.layoutEditing">
+          <button type="button" class="btn btn-sm hidden-xs" ng-class="{'btn-default': !$ctrl.dashboard.publicAccessEnabled, 'btn-primary': $ctrl.dashboard.publicAccessEnabled}" tooltip="Enable/Disable Share URL" ng-click="$ctrl.openShareForm()" ng-if="($ctrl.dashboard.canEdit() || $ctrl.dashboard.publicAccessEnabled) && !$ctrl.dashboard.is_draft && !$ctrl.layoutEditing" data-test="OpenShareForm">
             <span class="zmdi zmdi-share"></span>
           </button>
       </span>

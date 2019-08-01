@@ -155,6 +155,23 @@ class OrganizationSettings extends React.Component {
             ))}
           </Select>
         </Form.Item>
+        <Form.Item label="Multi-byte Search">
+          <Checkbox
+            name="multi_byte_search_enabled"
+            checked={formValues.multi_byte_search_enabled}
+            onChange={e => this.handleChange('multi_byte_search_enabled', e.target.checked)}
+          >
+          Enable multi-byte (Chinese, Japanese, and Korean) search for query names and descriptions (slower)
+          </Checkbox>
+        </Form.Item>
+        <Form.Item label="Email Reports">
+          <Checkbox
+            name="send_email_on_failed_scheduled_queries"
+            checked={formValues.send_email_on_failed_scheduled_queries}
+            onChange={e => this.handleChange('send_email_on_failed_scheduled_queries', e.target.checked)}
+          >Email query owners when scheduled queries fail
+          </Checkbox>
+        </Form.Item>
         <Form.Item label="Feature Flags">
           <Checkbox
             name="feature_show_permissions_control"

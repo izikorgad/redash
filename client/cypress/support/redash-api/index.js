@@ -19,15 +19,23 @@ export function createQuery(data, shouldPublish = true) {
   }, data);
 
   // eslint-disable-next-line cypress/no-assigning-return-values
-  let request = cy.request('POST', '/api/queries', merged);
+  let request = cy.request('POST', '/api/queries', merged).then(({ body }) => body);
   if (shouldPublish) {
-    request = request.then(({ body }) => (
-      cy.request('POST', `/api/queries/${body.id}`, { is_draft: false })
-        .then(() => body)
+    request = request.then(query => (
+      cy.request('POST', `/api/queries/${query.id}`, { is_draft: false })
+        .then(() => query)
     ));
   }
 
   return request;
+}
+
+export function createVisualization(queryId, type, name, options) {
+  const data = { query_id: queryId, type, name, options };
+  return cy.request('POST', '/api/visualizations', data).then(({ body }) => ({
+    query_id: queryId,
+    ...body,
+  }));
 }
 
 export function addTextbox(dashboardId, text = 'text', options = {}) {
@@ -51,14 +59,16 @@ export function addTextbox(dashboardId, text = 'text', options = {}) {
     });
 }
 
-export function addWidget(dashboardId, visualizationId) {
+export function addWidget(dashboardId, visualizationId, options = {}) {
+  const defaultOptions = {
+    position: { col: 0, row: 0, sizeX: 3, sizeY: 3 },
+  };
+
   const data = {
     width: 1,
     dashboard_id: dashboardId,
     visualization_id: visualizationId,
-    options: {
-      position: { col: 0, row: 0, sizeX: 3, sizeY: 3 },
-    },
+    options: merge(defaultOptions, options),
   };
 
   return cy.request('POST', 'api/widgets', data)

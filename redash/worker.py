@@ -12,12 +12,13 @@ from celery.utils.log import get_logger
 from redash import create_app, extensions, settings
 from redash.metrics import celery as celery_metrics  # noqa
 
-
 logger = get_logger(__name__)
 
 
 celery = Celery('redash',
                 broker=settings.CELERY_BROKER,
+                broker_use_ssl=settings.CELERY_SSL_CONFIG,
+                redis_backend_use_ssl=settings.CELERY_SSL_CONFIG,
                 include='redash.tasks')
 
 # The internal periodic Celery tasks to automatically schedule.
@@ -26,6 +27,10 @@ celery_schedule = {
         'task': 'redash.tasks.refresh_queries',
         'schedule': timedelta(seconds=30)
     },
+    'empty_schedules': {
+        'task': 'redash.tasks.empty_schedules',
+        'schedule': timedelta(minutes=60)
+    },
     'refresh_schemas': {
         'task': 'redash.tasks.refresh_schemas',
         'schedule': timedelta(minutes=settings.SCHEMAS_REFRESH_SCHEDULE)
@@ -33,6 +38,10 @@ celery_schedule = {
     'sync_user_details': {
         'task': 'redash.tasks.sync_user_details',
         'schedule': timedelta(minutes=1),
+    },
+    'send_aggregated_errors': {
+        'task': 'redash.tasks.send_aggregated_errors',
+        'schedule': timedelta(minutes=settings.SEND_FAILURE_EMAIL_INTERVAL),
     }
 }
 
@@ -57,8 +66,11 @@ celery.conf.update(result_backend=settings.CELERY_RESULT_BACKEND,
                    timezone='UTC',
                    result_expires=settings.CELERY_RESULT_EXPIRES,
                    worker_log_format=settings.CELERYD_WORKER_LOG_FORMAT,
-                   worker_task_log_format=settings.CELERYD_WORKER_TASK_LOG_FORMAT)
-
+                   worker_task_log_format=settings.CELERYD_WORKER_TASK_LOG_FORMAT,
+                   worker_prefetch_multiplier=settings.CELERY_WORKER_PREFETCH_MULTIPLIER,
+                   accept_content=settings.CELERY_ACCEPT_CONTENT, 
+                   task_serializer=settings.CELERY_TASK_SERIALIZER, 
+                   result_serializer=settings.CELERY_RESULT_SERIALIZER)
 
 # Create a new Task base class, that pushes a new Flask app context to allow DB connections if needed.
 TaskBase = celery.Task
