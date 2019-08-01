@@ -9,7 +9,7 @@ from redash.utils import json_dumps, json_loads
 logger = logging.getLogger(__name__)
 
 
-class Packboard(BaseSQLQueryRunner):
+class Firebolt(BaseSQLQueryRunner):
     noop_query = "SELECT 1"
 
     @classmethod
@@ -44,7 +44,7 @@ class Packboard(BaseSQLQueryRunner):
 
     @classmethod
     def type(cls):
-        return "packboard"
+        return "firebolt"
 
     def _get_tables(self, schema):
         query = "SELECT database, table, name FROM system.columns WHERE database NOT IN ('system')"
@@ -100,7 +100,7 @@ class Packboard(BaseSQLQueryRunner):
         else:
             return TYPE_STRING
 
-    def _packboard_query(self, query):
+    def _firebolt_query(self, query):
         query += '\nFORMAT JSON'
         result = self._send_query(query)
         columns = []
@@ -135,13 +135,13 @@ class Packboard(BaseSQLQueryRunner):
         return {'columns': columns, 'rows': rows}
 
     def run_query(self, query, user):
-        logger.debug("Packboard is about to execute query: %s", query)
+        logger.debug("Firebolt is about to execute query: %s", query)
         if query == "":
             json_data = None
             error = "Query is empty"
             return json_data, error
         try:
-            q = self._packboard_query(query)
+            q = self._firebolt_query(query)
             data = json_dumps(q)
             error = None
         except Exception as e:
@@ -150,4 +150,4 @@ class Packboard(BaseSQLQueryRunner):
             error = unicode(e)
         return data, error
 
-register(Packboard)
+register(Firebolt)
